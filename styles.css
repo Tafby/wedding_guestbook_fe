@@ -9,3 +9,27 @@
 #home-submit {
 	margin: 10px;
 }
+
+#c-div.card-body {
+	border: 1px solid black;
+	margin: 5px;
+}
+
+#comments {
+	height: 400px;
+	width: 500px;
+	overflow: scroll;
+	margin: 10px;
+}
+
+#user-img {
+	border: solid white round;
+	border-radius: 20px;
+	margin: 40px;
+}
+
+#show-card {
+	align-content: center;
+	margin-left: 350px;
+	margin-top: 100px;
+}

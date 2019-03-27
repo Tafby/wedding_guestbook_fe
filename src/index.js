@@ -8,7 +8,7 @@ const imageCardBody = document.getElementById('image-cardBody');
 
 window.addEventListener('DOMContentLoaded', (event) => {
 	console.log('DOM fully loaded and parsed');
-	// userForm();
+	//userForm();
 	fetchingData();
 	fetchingComments();
 });
@@ -37,17 +37,22 @@ function fetchingComments() {
 function renderComments(COMMENTS, imgObj, imageCardBody) {
 	let commentsDiv = document.createElement('div');
 	commentsDiv.id = 'comments';
+	commentsDiv.className = 'card';
 	imageCardBody.appendChild(commentsDiv);
 
 	for (let c of COMMENTS) {
 		if (c.image_id === imgObj.id) {
+			let cDiv = document.createElement('div');
+			cDiv.className = 'card-body';
+			cDiv.id = 'c-div';
+			commentsDiv.appendChild(cDiv);
 			let comment = document.createElement('p');
 			let smallUser = document.createElement('small');
 			comment.textContent = c.comment;
 			comment.id = 'comment-id';
 			smallUser.textContent = ` - With Love, ${c.user.name}`;
 			console.log('comments', c.comment);
-			commentsDiv.appendChild(comment);
+			cDiv.appendChild(comment);
 			comment.appendChild(smallUser);
 		}
 	}
@@ -99,6 +104,7 @@ function renderShowPage(imgObj, data) {
 	let body = document.body;
 	let cardMb = document.createElement('div');
 	cardMb.className = 'card';
+	cardMb.id = 'show-card';
 	cardMb.style = 'max-width: 80rem;';
 
 	let row = document.createElement('div');
@@ -119,6 +125,7 @@ function renderShowPage(imgObj, data) {
 
 	//these elements will be on the right side of the single image card
 	let userImg = document.createElement('img');
+	userImg.id = 'user-img';
 	let userName = document.createElement('p');
 	let time = document.createElement('p');
 	let likeButton = document.createElement('button');
@@ -128,6 +135,7 @@ function renderShowPage(imgObj, data) {
 	form.id = 'comment-form';
 	form.className = 'form-class';
 	let textInput = document.createElement('input');
+	textInput.placeholder = 'Add a comment!';
 	let submit = document.createElement('input');
 	submit.type = 'submit';
 	submit.className = 'btn btn-info';
@@ -150,7 +158,7 @@ function renderShowPage(imgObj, data) {
 	colOne.appendChild(img);
 	row.appendChild(colTwo);
 	colTwo.appendChild(cardBody);
-	cardBody.appendChild(cardCaption);
+	colOne.appendChild(cardCaption);
 
 	//appending comment section
 	cardBody.appendChild(form);
@@ -180,8 +188,8 @@ function renderShowPage(imgObj, data) {
 	});
 
 	cardBody.appendChild(likeButton);
-	colThree.appendChild(userImg);
-	colThree.appendChild(userName);
+	colOne.appendChild(userImg);
+	colOne.appendChild(userName);
 	cardBody.appendChild(time);
 }
 
@@ -198,15 +206,22 @@ function addNewComment(textInput, imgObj) {
 		.then((resp) => resp.json())
 		.then((json) => {
 			let div = document.getElementById('comments');
+
+			let cDiv = document.createElement('div');
+			cDiv.className = 'card-body';
+			cDiv.id = 'c-div';
+
 			let comment = document.createElement('p');
+
 			let smallUser = document.createElement('small');
 			comment.textContent = json.comment;
 			comment.id = 'comment-id';
 			smallUser.textContent = ` - With Love, ${json.user.name}`;
 			console.log('comments', json.comment);
-			div.appendChild(comment);
+
+			cDiv.appendChild(comment);
 			comment.appendChild(smallUser);
-			div.appendChild(comment);
+			div.appendChild(cDiv);
 		});
 }
 
