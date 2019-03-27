@@ -8,11 +8,16 @@ const imageCardBody = document.getElementById('image-cardBody');
 
 window.addEventListener('DOMContentLoaded', (event) => {
 	console.log('DOM fully loaded and parsed');
-	//userForm();
-	fetchingData();
-	fetchingComments();
-});
 
+	let user = localStorage.getItem('user_id');
+	if (user === null) {
+		hideButton('imageB');
+		userForm();
+	} else {
+		fetchingData();
+		fetchingComments();
+	}
+});
 function fetchingData() {
 	fetch(DATA_URL)
 		.then((response) => {
@@ -59,7 +64,7 @@ function renderComments(COMMENTS, imgObj, imageCardBody) {
 }
 
 function renderImages(DATAS) {
-	const mainCard = document.getElementById('main-card-group');
+	let mainCard = document.getElementById('main-card-group');
 
 	for (let i of DATAS) {
 		if (i.images.length > 0) {
@@ -94,12 +99,20 @@ function hideElements(element) {
 	e.id = 'hideDiv';
 }
 
-// function showElements() {
-// 	let mainCardGroup = document.getElementById('main-card-group');
-// 	mainCardGroup.removeAttribute('hideDiv');
-// }
+function hideButton(element) {
+	let e = document.getElementById(element);
+	// mainCardGroup.removeAttribute('showDiv');
+	e.id = 'hideButton';
+}
+
+function showElements(oldElement, newElement) {
+	let e = document.getElementById(oldElement);
+	e.removeAttribute('id');
+	e.setAttribute('id', newElement);
+}
 
 function renderShowPage(imgObj, data) {
+	hideButton('imageB');
 	//the new card for a single image
 	let body = document.body;
 	let cardMb = document.createElement('div');
@@ -129,6 +142,15 @@ function renderShowPage(imgObj, data) {
 	let userName = document.createElement('p');
 	let time = document.createElement('p');
 	let likeButton = document.createElement('button');
+
+	// Adding a back button to the page
+	let backButton = document.createElement('button');
+	backButton.id = 'back-button';
+	backButton.textContent = 'Go Back';
+	backButton.className = 'btn btn-info';
+	backButton.addEventListener('click', () => {
+		goBack();
+	});
 
 	//comment elements
 	let form = document.createElement('form');
@@ -190,7 +212,15 @@ function renderShowPage(imgObj, data) {
 	cardBody.appendChild(likeButton);
 	colOne.appendChild(userImg);
 	colOne.appendChild(userName);
+	colOne.appendChild(backButton);
 	cardBody.appendChild(time);
+}
+
+function goBack() {
+	hideElements('show-card');
+	showElements('hideDiv', 'main-card-group');
+	showElements('hideButton', 'imageB');
+	fetchingData();
 }
 
 function addNewComment(textInput, imgObj) {
@@ -199,7 +229,7 @@ function addNewComment(textInput, imgObj) {
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
 			comment: textInput.value,
-			user_id: 27,
+			user_id: localStorage.getItem('user_id'),
 			image_id: imgObj.id
 		})
 	})
@@ -228,22 +258,7 @@ function addNewComment(textInput, imgObj) {
 function userForm() {
 	let mainBody = document.body;
 	let homeForm = document.createElement('form');
-
-	let row = document.createElement('row');
-	row.id = 'row-id';
-	row.className = 'row';
-	let colOne = document.createElement('div');
-	colOne.className = 'col-md-4';
-	let colTwo = document.createElement('div');
-	colTwo.className = 'col-md-4';
-	let colThree = document.createElement('div');
-	colThree.className = 'col-md-4';
-
-	mainBody.appendChild(row);
-	row.appendChild(colOne);
-	row.appendChild(colTwo);
-	row.appendChild(colThree);
-	colTwo.appendChild(homeForm);
+	centerForm(mainBody, homeForm);
 
 	let nameDiv = document.createElement('div');
 	nameDiv.className = 'form-group';
@@ -285,7 +300,8 @@ function userForm() {
 	homeForm.addEventListener('submit', (ev) => {
 		ev.preventDefault();
 		inputName.clear;
-		creatUser(inputEmail, inputImg, inputName);
+		createUser(inputEmail, inputImg, inputName);
+		showElements('hideDiv', 'imageB');
 		fetchingData();
 		hideElements('row-id');
 	});
@@ -301,7 +317,7 @@ function userForm() {
 	homeForm.appendChild(inputSubmit);
 }
 
-function creatUser(inputEmail, inputImg, inputName) {
+function createUser(inputEmail, inputImg, inputName) {
 	fetch(DATA_URL, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -312,10 +328,11 @@ function creatUser(inputEmail, inputImg, inputName) {
 		})
 	})
 		.then((response) => {
-			return response;
+			return response.json();
 		})
 		.then((json) => {
 			console.log(json);
+			localStorage.setItem('user_id', json.id);
 		});
 }
 
@@ -333,5 +350,110 @@ function addLike(imgObj, likeButton) {
 		})
 		.then((json) => {
 			likeButton.textContent = `Like: ${json.likes}`;
+		});
+}
+
+// This function centers a form on the page
+function centerForm(mainAppend, formElement) {
+	let row = document.createElement('row');
+	row.id = 'row-id';
+	row.className = 'row';
+	let colOne = document.createElement('div');
+	colOne.className = 'col-md-4';
+	let colTwo = document.createElement('div');
+	colTwo.className = 'col-md-4';
+	let colThree = document.createElement('div');
+	colThree.className = 'col-md-4';
+
+	mainAppend.appendChild(row);
+	row.appendChild(colOne);
+	row.appendChild(colTwo);
+	row.appendChild(colThree);
+	colTwo.appendChild(formElement);
+}
+
+//add image section
+
+function createImageForm() {
+	let mainBody = document.body;
+	let imageForm = document.createElement('form');
+	imageForm.id = 'image-form';
+	centerForm(mainBody, imageForm);
+
+	let captionDiv = document.createElement('div');
+	captionDiv.className = 'form-group';
+
+	let imageDiv = document.createElement('div');
+	imageDiv.className = 'form-group';
+
+	let buttonDiv = document.createElement('div');
+	buttonDiv.className = 'form-group';
+
+	imageForm.appendChild(captionDiv);
+	imageForm.appendChild(imageDiv);
+	imageForm.appendChild(buttonDiv);
+
+	// creating the form
+
+	let inputCaption = document.createElement('input');
+	let captionLabel = document.createElement('label');
+	inputCaption.className = 'form-control';
+	inputCaption.id = 'input-caption';
+	captionLabel.textContent = 'Add a Caption!';
+
+	let inputImg = document.createElement('input');
+	// inputImg.type = 'file';
+	inputImg.className = 'form-control-file';
+	inputImg.id = 'img-input';
+	let imgLabel = document.createElement('label');
+	imgLabel.textContent = 'Add Your Photo';
+
+	let inputSubmit = document.createElement('button');
+	inputSubmit.className = 'btn btn-primary mb-2';
+	inputSubmit.id = 'image-submit';
+	inputSubmit.type = 'submit';
+	inputSubmit.textContent = 'Submit';
+
+	imageForm.addEventListener('submit', (ev) => {
+		ev.preventDefault();
+		createImage();
+		hideElements('image-form');
+		showElements('hideDiv', 'main-card-group');
+		// renderImages(DATAS);
+	});
+
+	// appending the form
+	captionDiv.appendChild(captionLabel);
+	captionDiv.appendChild(inputCaption);
+	buttonDiv.appendChild(imgLabel);
+	buttonDiv.appendChild(inputImg);
+	imageForm.appendChild(inputSubmit);
+}
+
+let imageB = document.getElementById('imageB');
+console.log('image b', imageB);
+imageB.addEventListener('click', () => {
+	console.log('fired!!!!!!!!');
+	const mainCard = document.getElementById('main-card-group');
+	hideElements('main-card-group');
+	createImageForm();
+});
+
+function createImage() {
+	fetch(IMAGES_URL, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			img_url: document.getElementById('img-input').value,
+			caption: document.getElementById('input-caption').value,
+			likes: 0,
+			user_id: localStorage.getItem('user_id')
+		})
+	})
+		.then((resp) => {
+			resp.json;
+		})
+		.then((json) => {
+			fetchingData(json);
 		});
 }

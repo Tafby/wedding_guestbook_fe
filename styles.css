@@ -1,6 +1,9 @@
 #hideDiv {
 	display: none;
 }
+#hideButton {
+	display: none;
+}
 
 .form-class {
 	padding: 10px;
