@@ -1,6 +1,7 @@
 'use strict';
 let DATAS = [];
 let COMMENTS = [];
+let IMAGES = [];
 const DATA_URL = 'http://localhost:3000/api/v1/users';
 const COMMENTS_URL = 'http://localhost:3000/api/v1/comments';
 const IMAGES_URL = 'http://localhost:3000/api/v1/images';
@@ -14,7 +15,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 		hideButton('imageB');
 		userForm();
 	} else {
-		fetchingData();
+		fetchingImages();
 		fetchingComments();
 	}
 });
@@ -25,7 +26,7 @@ function fetchingData() {
 		})
 		.then((json) => {
 			DATAS = json;
-			renderImages(DATAS);
+			// renderImages(DATAS);
 		});
 }
 
@@ -36,6 +37,18 @@ function fetchingComments() {
 		})
 		.then((json) => {
 			COMMENTS = json;
+		});
+}
+
+function fetchingImages() {
+	fetch(IMAGES_URL)
+		.then((response) => {
+			return response.json();
+		})
+		.then((json) => {
+			IMAGES = json;
+			renderImages(json);
+			console.log('this is the fetchingimages images', IMAGES);
 		});
 }
 
@@ -63,33 +76,30 @@ function renderComments(COMMENTS, imgObj, imageCardBody) {
 	}
 }
 
-function renderImages(DATAS) {
+function renderImages(IMAGES) {
 	let mainCard = document.getElementById('main-card-group');
+	// if (i.images.length > 0) {
+	for (let image of IMAGES) {
+		const card = document.createElement('div');
+		card.className = 'card';
+		const cardBody = document.createElement('div');
+		cardBody.className = 'card-body';
+		mainCard.appendChild(card);
 
-	for (let i of DATAS) {
-		if (i.images.length > 0) {
-			for (let imgObj of i.images) {
-				const card = document.createElement('div');
-				card.className = 'card';
-				const cardBody = document.createElement('div');
-				cardBody.className = 'card-body';
-				mainCard.appendChild(card);
-
-				let img = document.createElement('img');
-				img.addEventListener('click', () => {
-					hideElements('main-card-group');
-					renderShowPage(imgObj, i);
-				});
-				let p = document.createElement('p');
-				p.className = 'card-text';
-				img.className = 'card-img-top';
-				img.src = imgObj.img_url;
-				p.textContent = imgObj.caption;
-				card.appendChild(img);
-				card.appendChild(cardBody);
-				cardBody.appendChild(p);
-			}
-		}
+		let img = document.createElement('img');
+		img.addEventListener('click', () => {
+			hideElements('main-card-group');
+			renderShowPage(image);
+		});
+		let p = document.createElement('p');
+		p.className = 'card-text';
+		img.className = 'card-img-top';
+		img.src = image.img_url;
+		p.textContent = image.caption;
+		card.appendChild(img);
+		card.appendChild(cardBody);
+		cardBody.appendChild(p);
+		//createSingleImage(image);
 	}
 }
 
@@ -111,7 +121,8 @@ function showElements(oldElement, newElement) {
 	e.setAttribute('id', newElement);
 }
 
-function renderShowPage(imgObj, data) {
+function renderShowPage(image) {
+	console.log('this is the image inside of rendershowpage', image);
 	hideButton('imageB');
 	//the new card for a single image
 	let body = document.body;
@@ -164,7 +175,7 @@ function renderShowPage(imgObj, data) {
 
 	form.addEventListener('submit', (ev) => {
 		ev.preventDefault();
-		addNewComment(textInput, imgObj);
+		addNewComment(textInput, image);
 		document.getElementById('comment-form').reset();
 	});
 	//appending the form
@@ -184,29 +195,29 @@ function renderShowPage(imgObj, data) {
 
 	//appending comment section
 	cardBody.appendChild(form);
-
-	renderComments(COMMENTS, imgObj, cardBody);
+	console.log(image);
+	renderComments(COMMENTS, image, cardBody);
 
 	cardBody.appendChild(userImg);
 
 	//text fill in
-	img.src = imgObj.img_url;
-	cardCaption.textContent = imgObj.caption;
+	img.src = image.img_url;
+	cardCaption.textContent = image.caption;
 
 	//filling in the card details
-	userImg.src = data.avatar;
-	userName.textContent = data.name;
+	userImg.src = image.user.avatar;
+	userName.textContent = image.user.name;
 	time.className = 'card-text';
 	let smallText = document.createElement('small');
 	smallText.className = 'text-muted';
-	smallText.textContent = imgObj.created_at;
+	smallText.textContent = image.created_at;
 	time.appendChild(smallText);
 
 	//like button
-	likeButton.textContent = `Like: ${imgObj.likes}`;
+	likeButton.textContent = `Like: ${image.likes}`;
 	likeButton.className = 'btn btn-info';
 	likeButton.addEventListener('click', () => {
-		addLike(imgObj, likeButton);
+		addLike(image, likeButton);
 	});
 
 	cardBody.appendChild(likeButton);
@@ -220,7 +231,6 @@ function goBack() {
 	hideElements('show-card');
 	showElements('hideDiv', 'main-card-group');
 	showElements('hideButton', 'imageB');
-	fetchingData();
 }
 
 function addNewComment(textInput, imgObj) {
@@ -286,7 +296,6 @@ function userForm() {
 	emailLabel.textContent = 'Email';
 
 	let inputImg = document.createElement('input');
-	inputImg.type = 'file';
 	inputImg.className = 'form-control-file';
 	let imgLabel = document.createElement('label');
 	imgLabel.textContent = 'Add Your Photo';
@@ -299,10 +308,10 @@ function userForm() {
 
 	homeForm.addEventListener('submit', (ev) => {
 		ev.preventDefault();
-		inputName.clear;
+
 		createUser(inputEmail, inputImg, inputName);
-		showElements('hideDiv', 'imageB');
-		fetchingData();
+		showElements('hideButton', 'imageB');
+		fetchingImages();
 		hideElements('row-id');
 	});
 
@@ -333,6 +342,8 @@ function createUser(inputEmail, inputImg, inputName) {
 		.then((json) => {
 			console.log(json);
 			localStorage.setItem('user_id', json.id);
+			localStorage.setItem('avatar', json.avatar);
+			localStorage.setItem('name', json.name);
 		});
 }
 
@@ -418,7 +429,6 @@ function createImageForm() {
 		ev.preventDefault();
 		createImage();
 		hideElements('image-form');
-		showElements('hideDiv', 'main-card-group');
 		// renderImages(DATAS);
 	});
 
@@ -451,9 +461,38 @@ function createImage() {
 		})
 	})
 		.then((resp) => {
-			resp.json;
+			return resp.json();
 		})
 		.then((json) => {
-			fetchingData(json);
+			showElements('hideDiv', 'main-card-group');
+			console.log('this is the json', json);
+			console.log(document.getElementById('input-caption').value);
+			console.log(document.getElementById('img-input').value);
+
+			createSingleImage(json);
 		});
+}
+
+function createSingleImage(image) {
+	let mainCard = document.getElementById('main-card-group');
+	const card = document.createElement('div');
+	card.className = 'card';
+	const cardBody = document.createElement('div');
+	cardBody.className = 'card-body';
+	mainCard.appendChild(card);
+
+	let img = document.createElement('img');
+	img.addEventListener('click', () => {
+		hideElements('main-card-group');
+		console.log('this is inside the img.addeventlistener', image);
+		renderShowPage(image);
+	});
+	let p = document.createElement('p');
+	p.className = 'card-text';
+	img.className = 'card-img-top';
+	img.src = document.getElementById('img-input').value;
+	p.textContent = document.getElementById('input-caption').value;
+	card.appendChild(img);
+	card.appendChild(cardBody);
+	cardBody.appendChild(p);
 }
