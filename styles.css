@@ -3,7 +3,7 @@
 	height: 100%;
 	width: 100%;
 	margin: 0px;
-	background-color: rgb(245, 237, 252);
+	background-color: #ffd9ce;
 }
 
 #main-image-cap {
@@ -28,18 +28,23 @@
 }
 
 #c-div {
-	border: 1px solid lightgray;
-	margin: 5px;
+	/* border: 1px solid lightgray; */
+	border: 2px solid #7f6d67;
+	margin: 10px;
 	width: auto;
+	border-radius: 5px;
 }
 
 #comments {
 	overflow: scroll;
 	margin-top: 20px;
 	margin-bottom: 20px;
-	border: 3px solid lightgray;
-	padding: 10px;
+	/* border: 3px solid lightgray; */
+	border: 4px solid #7f6d67;
+	border-radius: 5px;
+	padding: 19px;
 	height: 300px;
+	background-color: #faefeb;
 }
 
 #user-img {
@@ -52,6 +57,7 @@
 	/* align-content: center; */
 	padding: 10px;
 	border-radius: 3em;
+	background-color: #faefeb;
 }
 
 #image-card-body {
@@ -59,9 +65,8 @@
 }
 
 #img-show {
-	margin-top: 40px;
-	padding-right: 50px;
-	border-radius: 12%;
+	border-radius: 1em;
+	max-width: 1500px;
 }
 
 #card-caption {
@@ -93,7 +98,7 @@
 
 #jumbo-id {
 	text-align: center;
-	background-color: rgba(0, 0, 0, 0.151);
+	background-color: #ccaea5;
 	color: white;
 }
 
@@ -103,17 +108,13 @@
 
 #image-main-card {
 	border-radius: 1em;
+	border: 10px solid #7f6d67;
 }
 
-#back-button {
-	margin-left: 30px;
-	padding: 20px;
-	border-radius: 10px;
-	background-color: white;
-	margin-top: 10px;
-}
 #back-div {
-	margin-bottom: 15em;
+	/* margin-bottom: 15em; */
+	position: absolute;
+	bottom: 45px;
 }
 #like-button {
 	margin-left: 1.75em;
@@ -131,4 +132,13 @@ canvas {
 #p-comment {
 	text-align: center;
 	font-size: 30px;
+}
+
+.btn {
+	margin-left: 30px;
+	padding: 10px;
+	border-radius: 5px;
+	background-color: white;
+	border: 1.5px solid #7f6d67;
+	margin-top: 10px;
 }

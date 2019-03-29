@@ -13,6 +13,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 	let user = localStorage.getItem('user_id');
 	if (user === null) {
 		hideButton('imageB');
+
 		userForm();
 	} else {
 		fetchingImages();
@@ -110,21 +111,15 @@ function renderImages(IMAGES) {
 }
 
 function hideElements(element) {
-	let e = document.getElementById(element);
-	// mainCardGroup.removeAttribute('showDiv');
-	e.id = 'hideDiv';
+	$('#' + element).fadeOut();
 }
 
 function hideButton(element) {
-	let e = document.getElementById(element);
-	// mainCardGroup.removeAttribute('showDiv');
-	e.id = 'hideButton';
+	$('#' + element).fadeOut();
 }
 
 function showElements(oldElement, newElement) {
-	let e = document.getElementById(oldElement);
-	e.removeAttribute('id');
-	e.setAttribute('id', newElement);
+	$('#' + newElement).fadeIn();
 }
 
 function renderShowPage(image) {
@@ -134,7 +129,7 @@ function renderShowPage(image) {
 	//the new card for a single image
 	let body = document.body;
 	let cardDiv = document.createElement('div');
-	cardDiv.className = 'card';
+	cardDiv.className = 'card shadow-lg';
 	cardDiv.id = 'show-card';
 	cardDiv.style = 'max-width:';
 
@@ -186,8 +181,9 @@ function renderShowPage(image) {
 	let backButton = document.createElement('button');
 	backButton.id = 'back-button';
 	backButton.textContent = 'Go Back';
-	backButton.className = 'btn btn-outline-warning';
+	backButton.className = 'btn';
 	backButton.addEventListener('click', () => {
+		$(row).remove();
 		goBack();
 	});
 
@@ -205,7 +201,7 @@ function renderShowPage(image) {
 	let submit = document.createElement('input');
 	submit.type = 'submit';
 	submit.id = 'comment-submit';
-	submit.className = 'btn btn-outline-warning';
+	submit.className = 'btn';
 
 	form.addEventListener('submit', (ev) => {
 		ev.preventDefault();
@@ -243,23 +239,22 @@ function renderShowPage(image) {
 
 	//like button
 	likeButton.textContent = `Like this photo: ${image.likes} `;
-	likeButton.className = 'btn btn-outline-warning';
+	likeButton.className = 'btn';
 	likeButton.id = 'like-button';
 	likeButton.addEventListener('click', () => {
 		addLike(image, likeButton);
 	});
 
-	showColOne.appendChild(backDiv);
-	backDiv.appendChild(backButton);
 	showColOne.appendChild(userDiv);
 	showColOne.appendChild(likeButton);
-
 	userDiv.appendChild(userName);
 	userDiv.appendChild(userImg);
+	showColOne.appendChild(backDiv);
+	backDiv.appendChild(backButton);
 }
 
 function goBack() {
-	hideElements('show-card');
+	// hideElements('show-card');
 	showElements('hideDiv', 'main-card-group');
 	showElements('hideButton', 'imageB');
 }
@@ -276,6 +271,7 @@ function addNewComment(textInput, imgObj) {
 	})
 		.then((resp) => resp.json())
 		.then((json) => {
+			COMMENTS.push(json);
 			let div = document.getElementById('comments');
 
 			let cDiv = document.createElement('div');
@@ -451,7 +447,7 @@ function createImageForm() {
 	imgLabel.textContent = 'Add Your Photo';
 
 	let inputSubmit = document.createElement('button');
-	inputSubmit.className = 'btn btn-outline-warning';
+	inputSubmit.className = 'btn';
 	inputSubmit.id = 'image-submit';
 	inputSubmit.type = 'submit';
 	inputSubmit.textContent = 'Submit';
