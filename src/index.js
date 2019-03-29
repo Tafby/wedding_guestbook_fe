@@ -79,7 +79,6 @@ function renderComments(COMMENTS, imgObj, imageCardBody) {
 			comment.textContent = c.comment;
 			comment.id = 'comment-id';
 			smallUser.textContent = ` - With Love, ${c.user.name}`;
-			console.log('comments', c.comment);
 			cDiv.appendChild(comment);
 			comment.appendChild(smallUser);
 		}
@@ -88,6 +87,7 @@ function renderComments(COMMENTS, imgObj, imageCardBody) {
 //this function will render all images by creating the elements and showing them on the page
 function renderImages(IMAGES) {
 	let mainCard = document.getElementById('main-card-group');
+	// if (i.images.length > 0) {
 	for (let image of IMAGES) {
 		const card = document.createElement('div');
 		card.className = 'card shadow-lg';
@@ -116,7 +116,6 @@ function renderImages(IMAGES) {
 
 //this function will render a new show page for each image
 function renderShowPage(image) {
-	console.log('this is the image inside of rendershowpage', image);
 	hideButton('imageB');
 	hideButton('attending');
 
@@ -222,7 +221,6 @@ function renderShowPage(image) {
 
 	//appending comment section
 	cardBody.appendChild(form);
-	console.log(image);
 	renderComments(COMMENTS, image, cardBody);
 
 	userImg.src = image.user.avatar;
@@ -255,7 +253,6 @@ function hideElements(element) {
 	$('#' + element).fadeOut('slow', function() {
 		// Animation complete
 	});
-	console.log('hiding', element);
 }
 
 //this function hides buttons and fades them out
@@ -305,7 +302,6 @@ function addNewComment(textInput, imgObj) {
 			comment.textContent = json.comment;
 			comment.id = 'comment-id';
 			smallUser.textContent = ` - With Love, ${json.user.name}`;
-			console.log('comments', json.comment);
 
 			cDiv.appendChild(comment);
 			comment.appendChild(smallUser);
@@ -387,7 +383,6 @@ function createUser(inputEmail, inputImg, inputName) {
 			return response.json();
 		})
 		.then((json) => {
-			console.log(json);
 			localStorage.setItem('user_id', json.id);
 			localStorage.setItem('avatar', json.avatar);
 			localStorage.setItem('name', json.name);
@@ -529,7 +524,6 @@ function createSingleImage(image) {
 	let img = document.createElement('img');
 	img.addEventListener('click', () => {
 		hideElements('main-card-group');
-		console.log('this is inside the img.addeventlistener', image);
 		renderShowPage(image);
 	});
 	let p = document.createElement('p');
@@ -571,7 +565,6 @@ function showAttendents(DATAS) {
 	fetchingData();
 	//looping through the 'data' or users
 	for (let data of DATAS) {
-		console.log('where in the show attending data loop');
 		let faceDiv = document.createElement('div');
 		faceDiv.id = 'face-div';
 		let faceName = document.createElement('p');
