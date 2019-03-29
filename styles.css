@@ -142,3 +142,10 @@ canvas {
 	border: 1.5px solid #7f6d67;
 	margin-top: 10px;
 }
+
+#face-div {
+	display: inline-block;
+	margin-left: 70px;
+	margin-bottom: 20px;
+	align-content: center;
+}

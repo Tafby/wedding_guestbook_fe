@@ -13,11 +13,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
 	let user = localStorage.getItem('user_id');
 	if (user === null) {
 		hideButton('imageB');
-
+		hideButton('attending');
 		userForm();
 	} else {
 		fetchingImages();
 		fetchingComments();
+		fetchingData();
 	}
 });
 function fetchingData() {
@@ -111,20 +112,26 @@ function renderImages(IMAGES) {
 }
 
 function hideElements(element) {
-	$('#' + element).fadeOut();
+	$('#' + element).fadeOut('slow', function() {
+		// Animation complete
+	});
+	console.log('hiding', element);
 }
 
 function hideButton(element) {
 	$('#' + element).fadeOut();
 }
 
-function showElements(oldElement, newElement) {
-	$('#' + newElement).fadeIn();
+function showElements(element) {
+	$('#' + element).fadeIn('slow', function() {
+		// Animation complete
+	});
 }
 
 function renderShowPage(image) {
 	console.log('this is the image inside of rendershowpage', image);
 	hideButton('imageB');
+	hideButton('attending');
 
 	//the new card for a single image
 	let body = document.body;
@@ -136,6 +143,7 @@ function renderShowPage(image) {
 	//this is the divs within the cardDiv
 	let showRow = document.createElement('div');
 	showRow.className = 'row';
+	showRow.id = 'show-row-id';
 	let showColOne = document.createElement('div');
 	showColOne.className = 'col-md-2';
 	let showColTwo = document.createElement('div');
@@ -255,8 +263,9 @@ function renderShowPage(image) {
 
 function goBack() {
 	// hideElements('show-card');
-	showElements('hideDiv', 'main-card-group');
-	showElements('hideButton', 'imageB');
+	showElements('main-card-group');
+	showElements('imageB');
+	showElements('attending');
 }
 
 function addNewComment(textInput, imgObj) {
@@ -328,7 +337,7 @@ function userForm() {
 	imgLabel.textContent = 'Add Your Photo';
 
 	let inputSubmit = document.createElement('button');
-	inputSubmit.className = 'btn btn-primary mb-2';
+	inputSubmit.className = 'btn';
 	inputSubmit.id = 'home-submit';
 	inputSubmit.type = 'submit';
 	inputSubmit.textContent = 'Submit';
@@ -337,8 +346,11 @@ function userForm() {
 		ev.preventDefault();
 
 		createUser(inputEmail, inputImg, inputName);
-		showElements('hideButton', 'imageB');
-		fetchingImages();
+		showElements('imageB');
+		showElements('attending');
+		// fetchingImages();
+		// fetchingData();
+		// fetchingComments();
 		hideElements('row-id');
 	});
 
@@ -371,6 +383,9 @@ function createUser(inputEmail, inputImg, inputName) {
 			localStorage.setItem('user_id', json.id);
 			localStorage.setItem('avatar', json.avatar);
 			localStorage.setItem('name', json.name);
+			fetchingImages();
+			fetchingData();
+			fetchingComments();
 		});
 }
 
@@ -456,7 +471,6 @@ function createImageForm() {
 		ev.preventDefault();
 		createImage();
 		hideElements('image-form');
-		// renderImages(DATAS);
 	});
 
 	// appending the form
@@ -491,7 +505,7 @@ function createImage() {
 			return resp.json();
 		})
 		.then((json) => {
-			showElements('hideDiv', 'main-card-group');
+			showElements('main-card-group');
 			console.log('this is the json', json);
 			console.log(document.getElementById('input-caption').value);
 			console.log(document.getElementById('img-input').value);
@@ -507,6 +521,7 @@ function createSingleImage(image) {
 	const cardBody = document.createElement('div');
 	cardBody.className = 'card-body';
 	mainCard.appendChild(card);
+	card.id = 'image-main-card';
 
 	let img = document.createElement('img');
 	img.addEventListener('click', () => {
@@ -519,12 +534,68 @@ function createSingleImage(image) {
 	img.className = 'card-img-top';
 	img.src = document.getElementById('img-input').value;
 	p.textContent = document.getElementById('input-caption').value;
+	p.id = 'main-image-cap';
 	card.appendChild(img);
 	card.appendChild(cardBody);
 	cardBody.appendChild(p);
 }
 
-//clock JS
+//ATTENDING BUTTON AND FUNCTION
+
+let attending = document.getElementById('attending');
+console.log('attending made', attending);
+attending.addEventListener('click', () => {
+	console.log('atttending clikced');
+	hideElements('main-card-group');
+	showAttendents(DATAS);
+});
+
+function showAttendents(DATAS) {
+	console.log('were in showAttending');
+	hideButton('imageB');
+	hideButton('attending');
+	console.log('we hid buttons');
+	let mainBody = document.body;
+	let mainFaceDiv = document.createElement('div');
+	mainFaceDiv.id = 'main-face-div';
+	let faceBackButton = document.createElement('button');
+	faceBackButton.id = 'back-button';
+	faceBackButton.textContent = 'Go Back';
+	faceBackButton.className = 'btn';
+	mainBody.appendChild(mainFaceDiv);
+	mainFaceDiv.appendChild(faceBackButton);
+	faceBackButton.addEventListener('click', () => {
+		goBackUsers();
+		console.log('in the back button');
+	});
+	fetchingData();
+	for (let data of DATAS) {
+		console.log('where in the show attending data loop');
+		let faceDiv = document.createElement('div');
+		faceDiv.id = 'face-div';
+		let faceName = document.createElement('p');
+		faceName.id = 'face-name';
+		faceName.textContent = data.name;
+		let faceImg = document.createElement('img');
+		faceImg.id = 'user-img';
+		faceImg.src = data.avatar;
+		mainFaceDiv.appendChild(faceDiv);
+		faceDiv.appendChild(faceName);
+		faceDiv.appendChild(faceImg);
+	}
+}
+
+function goBackUsers() {
+	console.log('in the back users');
+	$('#main-face-div').remove();
+	$('#show-row-id').remove();
+	hideElements('main-face-div');
+	showElements('main-card-group');
+	showElements('imageB');
+	showElements('attending');
+}
+
+//CLOCK JS WE FOUND FROM THE INTERNET
 function getTimeRemaining(endtime) {
 	var t = Date.parse(endtime) - Date.parse(new Date());
 	var seconds = Math.floor((t / 1000) % 60);
