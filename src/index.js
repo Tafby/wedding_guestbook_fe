@@ -54,6 +54,10 @@ function fetchingImages() {
 
 function renderComments(COMMENTS, imgObj, imageCardBody) {
 	let commentsDiv = document.createElement('div');
+	let p = document.createElement('p');
+	p.textContent = 'Comments';
+	p.id = 'p-comment';
+	imageCardBody.append(p);
 	commentsDiv.id = 'comments';
 	commentsDiv.className = 'card';
 	imageCardBody.appendChild(commentsDiv);
@@ -82,6 +86,7 @@ function renderImages(IMAGES) {
 	for (let image of IMAGES) {
 		const card = document.createElement('div');
 		card.className = 'card';
+		card.id = 'image-main-card';
 		const cardBody = document.createElement('div');
 		cardBody.className = 'card-body';
 		mainCard.appendChild(card);
@@ -96,6 +101,7 @@ function renderImages(IMAGES) {
 		img.className = 'card-img-top';
 		img.src = image.img_url;
 		p.textContent = image.caption;
+		p.id = 'main-image-cap';
 		card.appendChild(img);
 		card.appendChild(cardBody);
 		cardBody.appendChild(p);
@@ -124,54 +130,82 @@ function showElements(oldElement, newElement) {
 function renderShowPage(image) {
 	console.log('this is the image inside of rendershowpage', image);
 	hideButton('imageB');
+
 	//the new card for a single image
 	let body = document.body;
-	let cardMb = document.createElement('div');
-	cardMb.className = 'card';
-	cardMb.id = 'show-card';
-	cardMb.style = 'max-width: 80rem;';
+	let cardDiv = document.createElement('div');
+	cardDiv.className = 'card';
+	cardDiv.id = 'show-card';
+	cardDiv.style = 'max-width:';
 
+	//this is the divs within the cardDiv
+	let showRow = document.createElement('div');
+	showRow.className = 'row';
+	let showColOne = document.createElement('div');
+	showColOne.className = 'col-md-2';
+	let showColTwo = document.createElement('div');
+	showColTwo.className = 'col-md-10';
+
+	cardDiv.appendChild(showRow);
+	showRow.appendChild(showColOne);
+	showRow.appendChild(showColTwo);
+
+	//this is the body's row and divs
 	let row = document.createElement('div');
-	row.className = 'row no-gutters';
-	let colOne = document.createElement('div');
-	colOne.className = 'col-md-6';
+	row.className = 'row';
 	let colTwo = document.createElement('div');
-	colTwo.classList = 'col-md-5';
+	colTwo.className = 'col-md-10';
+	let colThree = document.createElement('div');
+	colThree.classList = 'col-md-1';
 	let cardBody = document.createElement('div');
+
+	//this is the card body that holds the info
 	cardBody.className = 'card-body';
 	cardBody.id = 'image-cardBody';
 	let img = document.createElement('img');
 	img.className = 'card-img';
+	img.id = 'img-show';
 	let cardCaption = document.createElement('h5');
 	cardCaption.className = 'card-title';
-	let colThree = document.createElement('div');
-	colThree.className = 'col-md-1';
+	cardCaption.id = 'card-caption';
+	let colOne = document.createElement('div');
+	colOne.className = 'col-md-1';
 
 	//these elements will be on the right side of the single image card
+	let userDiv = document.createElement('div');
+	userDiv.id = 'user-div';
+	let backDiv = document.createElement('div');
+	backDiv.id = 'back-div';
+	let userName = document.createElement('p');
+	userName.id = 'user-name';
 	let userImg = document.createElement('img');
 	userImg.id = 'user-img';
-	let userName = document.createElement('p');
-	let time = document.createElement('p');
 	let likeButton = document.createElement('button');
 
 	// Adding a back button to the page
 	let backButton = document.createElement('button');
 	backButton.id = 'back-button';
 	backButton.textContent = 'Go Back';
-	backButton.className = 'btn btn-info';
+	backButton.className = 'btn btn-outline-warning';
 	backButton.addEventListener('click', () => {
 		goBack();
 	});
 
 	//comment elements
 	let form = document.createElement('form');
+	let formDivA = document.createElement('div');
+	let formDivB = document.createElement('div');
+	formDivA.className = 'form-group';
+	formDivB.className = 'form-group';
 	form.id = 'comment-form';
-	form.className = 'form-class';
 	let textInput = document.createElement('input');
+	textInput.id = 'comment-text-input';
 	textInput.placeholder = 'Add a comment!';
+	textInput.className = 'form-control';
 	let submit = document.createElement('input');
 	submit.type = 'submit';
-	submit.className = 'btn btn-info';
+	submit.id = 'comment-submit';
+	submit.className = 'btn btn-outline-warning';
 
 	form.addEventListener('submit', (ev) => {
 		ev.preventDefault();
@@ -179,52 +213,49 @@ function renderShowPage(image) {
 		document.getElementById('comment-form').reset();
 	});
 	//appending the form
-
-	form.appendChild(textInput);
-	form.appendChild(submit);
+	form.appendChild(formDivA);
+	form.appendChild(formDivB);
+	formDivA.appendChild(textInput);
+	formDivB.appendChild(submit);
 
 	//appending new card
-	body.appendChild(cardMb);
-	cardMb.appendChild(row);
+	colTwo.appendChild(cardDiv);
+	body.appendChild(row);
 	row.appendChild(colThree);
-	row.appendChild(colOne);
-	colOne.appendChild(img);
 	row.appendChild(colTwo);
-	colTwo.appendChild(cardBody);
-	colOne.appendChild(cardCaption);
+	cardBody.appendChild(img);
+	row.appendChild(colOne);
+	showColTwo.appendChild(cardBody);
+	cardBody.appendChild(cardCaption);
 
 	//appending comment section
 	cardBody.appendChild(form);
 	console.log(image);
 	renderComments(COMMENTS, image, cardBody);
 
-	cardBody.appendChild(userImg);
-
+	userImg.src = image.user.avatar;
+	userName.textContent = ` Posted By: ${image.user.name}`;
 	//text fill in
 	img.src = image.img_url;
-	cardCaption.textContent = image.caption;
+	cardCaption.textContent = `"${image.caption}"`;
 
 	//filling in the card details
-	userImg.src = image.user.avatar;
-	userName.textContent = image.user.name;
-	time.className = 'card-text';
-	let smallText = document.createElement('small');
-	smallText.className = 'text-muted';
-	smallText.textContent = image.created_at;
-	time.appendChild(smallText);
 
 	//like button
-	likeButton.textContent = `Like: ${image.likes}`;
-	likeButton.className = 'btn btn-info';
+	likeButton.textContent = `Like this photo: ${image.likes} `;
+	likeButton.className = 'btn btn-outline-warning';
+	likeButton.id = 'like-button';
 	likeButton.addEventListener('click', () => {
 		addLike(image, likeButton);
 	});
 
-	cardBody.appendChild(likeButton);
-	colOne.appendChild(userImg);
-	colOne.appendChild(userName);
-	colOne.appendChild(backButton);
-	cardBody.appendChild(time);
+	showColOne.appendChild(backDiv);
+	backDiv.appendChild(backButton);
+	showColOne.appendChild(userDiv);
+	showColOne.appendChild(likeButton);
+
+	userDiv.appendChild(userName);
+	userDiv.appendChild(userImg);
 }
 
 function goBack() {
@@ -360,7 +391,7 @@ function addLike(imgObj, likeButton) {
 			return response.json();
 		})
 		.then((json) => {
-			likeButton.textContent = `Like: ${json.likes}`;
+			likeButton.textContent = `Like this photo! ${json.likes} `;
 		});
 }
 
@@ -420,7 +451,7 @@ function createImageForm() {
 	imgLabel.textContent = 'Add Your Photo';
 
 	let inputSubmit = document.createElement('button');
-	inputSubmit.className = 'btn btn-primary mb-2';
+	inputSubmit.className = 'btn btn-outline-warning';
 	inputSubmit.id = 'image-submit';
 	inputSubmit.type = 'submit';
 	inputSubmit.textContent = 'Submit';
@@ -496,3 +527,46 @@ function createSingleImage(image) {
 	card.appendChild(cardBody);
 	cardBody.appendChild(p);
 }
+
+//clock JS
+function getTimeRemaining(endtime) {
+	var t = Date.parse(endtime) - Date.parse(new Date());
+	var seconds = Math.floor((t / 1000) % 60);
+	var minutes = Math.floor((t / 1000 / 60) % 60);
+	var hours = Math.floor((t / (1000 * 60 * 60)) % 24);
+	var days = Math.floor(t / (1000 * 60 * 60 * 24));
+	return {
+		total: t,
+		days: days,
+		hours: hours,
+		minutes: minutes,
+		seconds: seconds
+	};
+}
+
+function initializeClock(id, endtime) {
+	var clock = document.getElementById(id);
+	var daysSpan = clock.querySelector('.days');
+	var hoursSpan = clock.querySelector('.hours');
+	var minutesSpan = clock.querySelector('.minutes');
+	var secondsSpan = clock.querySelector('.seconds');
+
+	function updateClock() {
+		var t = getTimeRemaining(endtime);
+
+		daysSpan.innerHTML = t.days;
+		hoursSpan.innerHTML = ('0' + t.hours).slice(-2);
+		minutesSpan.innerHTML = ('0' + t.minutes).slice(-2);
+		secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
+
+		if (t.total <= 0) {
+			clearInterval(timeinterval);
+		}
+	}
+
+	updateClock();
+	var timeinterval = setInterval(updateClock, 1000);
+}
+
+var deadline = new Date(Date.parse(new Date()) + 90 * 24 * 60 * 60 * 1000);
+initializeClock('clockdiv', deadline);
