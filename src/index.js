@@ -10,6 +10,7 @@ const imageCardBody = document.getElementById('image-cardBody');
 window.addEventListener('DOMContentLoaded', (event) => {
 	console.log('DOM fully loaded and parsed');
 
+	//this checks if a user has been created in localstorage
 	let user = localStorage.getItem('user_id');
 	if (user === null) {
 		hideButton('imageB');
@@ -21,6 +22,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
 		fetchingData();
 	}
 });
+
+//FETCHING FUNCTIONS
+//this fetches the all users
 function fetchingData() {
 	fetch(DATA_URL)
 		.then((response) => {
@@ -28,10 +32,9 @@ function fetchingData() {
 		})
 		.then((json) => {
 			DATAS = json;
-			// renderImages(DATAS);
 		});
 }
-
+//this fetches all comments
 function fetchingComments() {
 	fetch(COMMENTS_URL)
 		.then((response) => {
@@ -41,7 +44,7 @@ function fetchingComments() {
 			COMMENTS = json;
 		});
 }
-
+//this fetches all images
 function fetchingImages() {
 	fetch(IMAGES_URL)
 		.then((response) => {
@@ -50,11 +53,12 @@ function fetchingImages() {
 		.then((json) => {
 			IMAGES = json;
 			renderImages(json);
-			console.log('this is the fetchingimages images', IMAGES);
 		});
 }
-
+//RENDER FUNCTIONS
+//this function renders comments by creating the elements and showing them to the page
 function renderComments(COMMENTS, imgObj, imageCardBody) {
+	//creating the comments div, comment title, and creates card body
 	let commentsDiv = document.createElement('div');
 	let p = document.createElement('p');
 	p.textContent = 'Comments';
@@ -63,7 +67,7 @@ function renderComments(COMMENTS, imgObj, imageCardBody) {
 	commentsDiv.id = 'comments';
 	commentsDiv.className = 'card';
 	imageCardBody.appendChild(commentsDiv);
-
+	//iterating through the comments and creating each comment div
 	for (let c of COMMENTS) {
 		if (c.image_id === imgObj.id) {
 			let cDiv = document.createElement('div');
@@ -81,19 +85,19 @@ function renderComments(COMMENTS, imgObj, imageCardBody) {
 		}
 	}
 }
-
+//this function will render all images by creating the elements and showing them on the page
 function renderImages(IMAGES) {
 	let mainCard = document.getElementById('main-card-group');
-	// if (i.images.length > 0) {
 	for (let image of IMAGES) {
 		const card = document.createElement('div');
-		card.className = 'card';
+		card.className = 'card shadow-lg';
 		card.id = 'image-main-card';
 		const cardBody = document.createElement('div');
 		cardBody.className = 'card-body';
 		mainCard.appendChild(card);
 
 		let img = document.createElement('img');
+		//when you click an image, this will hide all images and show one image
 		img.addEventListener('click', () => {
 			hideElements('main-card-group');
 			renderShowPage(image);
@@ -107,27 +111,10 @@ function renderImages(IMAGES) {
 		card.appendChild(img);
 		card.appendChild(cardBody);
 		cardBody.appendChild(p);
-		//createSingleImage(image);
 	}
 }
 
-function hideElements(element) {
-	$('#' + element).fadeOut('slow', function() {
-		// Animation complete
-	});
-	console.log('hiding', element);
-}
-
-function hideButton(element) {
-	$('#' + element).fadeOut();
-}
-
-function showElements(element) {
-	$('#' + element).fadeIn('slow', function() {
-		// Animation complete
-	});
-}
-
+//this function will render a new show page for each image
 function renderShowPage(image) {
 	console.log('this is the image inside of rendershowpage', image);
 	hideButton('imageB');
@@ -190,6 +177,7 @@ function renderShowPage(image) {
 	backButton.id = 'back-button';
 	backButton.textContent = 'Go Back';
 	backButton.className = 'btn';
+	//when you click the back button, it removes row(which is the show page) and unhides the main images page
 	backButton.addEventListener('click', () => {
 		$(row).remove();
 		goBack();
@@ -210,7 +198,7 @@ function renderShowPage(image) {
 	submit.type = 'submit';
 	submit.id = 'comment-submit';
 	submit.className = 'btn';
-
+	//submit button will add a new comment
 	form.addEventListener('submit', (ev) => {
 		ev.preventDefault();
 		addNewComment(textInput, image);
@@ -243,12 +231,11 @@ function renderShowPage(image) {
 	img.src = image.img_url;
 	cardCaption.textContent = `"${image.caption}"`;
 
-	//filling in the card details
-
 	//like button
 	likeButton.textContent = `Like this photo: ${image.likes} `;
 	likeButton.className = 'btn';
 	likeButton.id = 'like-button';
+	//like button will add a like unpon click
 	likeButton.addEventListener('click', () => {
 		addLike(image, likeButton);
 	});
@@ -260,14 +247,38 @@ function renderShowPage(image) {
 	showColOne.appendChild(backDiv);
 	backDiv.appendChild(backButton);
 }
+//----END OF SHOW PAGE FUNCTION----
 
+//---HIDE AND SHOW FUNCTIONS---
+//this function hides elements and fades them out
+function hideElements(element) {
+	$('#' + element).fadeOut('slow', function() {
+		// Animation complete
+	});
+	console.log('hiding', element);
+}
+
+//this function hides buttons and fades them out
+function hideButton(element) {
+	$('#' + element).fadeOut();
+}
+
+//this function shows the elements and fades them in
+function showElements(element) {
+	$('#' + element).fadeIn('slow', function() {
+		// Animation complete
+	});
+}
+
+//GO BACK FUNCTION
+//shows all the main page elements
 function goBack() {
-	// hideElements('show-card');
 	showElements('main-card-group');
 	showElements('imageB');
 	showElements('attending');
 }
 
+//adds a new comment via post
 function addNewComment(textInput, imgObj) {
 	fetch(COMMENTS_URL, {
 		method: 'POST',
@@ -280,6 +291,7 @@ function addNewComment(textInput, imgObj) {
 	})
 		.then((resp) => resp.json())
 		.then((json) => {
+			//adding a new comment on the show page once created
 			COMMENTS.push(json);
 			let div = document.getElementById('comments');
 
@@ -300,7 +312,8 @@ function addNewComment(textInput, imgObj) {
 			div.appendChild(cDiv);
 		});
 }
-
+//CREATE USERS FUNCTION
+//creates the new user form
 function userForm() {
 	let mainBody = document.body;
 	let homeForm = document.createElement('form');
@@ -320,7 +333,6 @@ function userForm() {
 	homeForm.appendChild(imgDiv);
 
 	// creating the form
-
 	let inputName = document.createElement('input');
 	let nameLabel = document.createElement('label');
 	inputName.className = 'form-control';
@@ -342,20 +354,16 @@ function userForm() {
 	inputSubmit.type = 'submit';
 	inputSubmit.textContent = 'Submit';
 
+	//upon submit, this will create a user and show all the images and buttons on main page while hiding the user form
 	homeForm.addEventListener('submit', (ev) => {
 		ev.preventDefault();
-
 		createUser(inputEmail, inputImg, inputName);
 		showElements('imageB');
 		showElements('attending');
-		// fetchingImages();
-		// fetchingData();
-		// fetchingComments();
 		hideElements('row-id');
 	});
 
 	// appending the form
-
 	nameDiv.appendChild(nameLabel);
 	nameDiv.appendChild(inputName);
 	emailDiv.appendChild(emailLabel);
@@ -364,7 +372,7 @@ function userForm() {
 	imgDiv.appendChild(inputImg);
 	homeForm.appendChild(inputSubmit);
 }
-
+//creates user via post, sets the local storage, and fetches all
 function createUser(inputEmail, inputImg, inputName) {
 	fetch(DATA_URL, {
 		method: 'POST',
@@ -389,6 +397,7 @@ function createUser(inputEmail, inputImg, inputName) {
 		});
 }
 
+//this adds a like via patch and updates on page
 function addLike(imgObj, likeButton) {
 	imgObj.likes++;
 	fetch(IMAGES_URL + `/${imgObj.id}`, {
@@ -425,8 +434,7 @@ function centerForm(mainAppend, formElement) {
 	colTwo.appendChild(formElement);
 }
 
-//add image section
-
+//creates new image
 function createImageForm() {
 	let mainBody = document.body;
 	let imageForm = document.createElement('form');
@@ -446,8 +454,7 @@ function createImageForm() {
 	imageForm.appendChild(imageDiv);
 	imageForm.appendChild(buttonDiv);
 
-	// creating the form
-
+	// creating the form for new image
 	let inputCaption = document.createElement('input');
 	let captionLabel = document.createElement('label');
 	inputCaption.className = 'form-control';
@@ -455,7 +462,6 @@ function createImageForm() {
 	captionLabel.textContent = 'Add a Caption!';
 
 	let inputImg = document.createElement('input');
-	// inputImg.type = 'file';
 	inputImg.className = 'form-control-file';
 	inputImg.id = 'img-input';
 	let imgLabel = document.createElement('label');
@@ -466,7 +472,7 @@ function createImageForm() {
 	inputSubmit.id = 'image-submit';
 	inputSubmit.type = 'submit';
 	inputSubmit.textContent = 'Submit';
-
+	//upon click, this will create image, and hide the create image form
 	imageForm.addEventListener('submit', (ev) => {
 		ev.preventDefault();
 		createImage();
@@ -481,15 +487,15 @@ function createImageForm() {
 	imageForm.appendChild(inputSubmit);
 }
 
+//grabbing the add memory button
 let imageB = document.getElementById('imageB');
-console.log('image b', imageB);
+//upon click it will hide the main images and create an image
 imageB.addEventListener('click', () => {
-	console.log('fired!!!!!!!!');
-	const mainCard = document.getElementById('main-card-group');
 	hideElements('main-card-group');
 	createImageForm();
 });
 
+//creates an image via post and displays to page
 function createImage() {
 	fetch(IMAGES_URL, {
 		method: 'POST',
@@ -506,14 +512,11 @@ function createImage() {
 		})
 		.then((json) => {
 			showElements('main-card-group');
-			console.log('this is the json', json);
-			console.log(document.getElementById('input-caption').value);
-			console.log(document.getElementById('img-input').value);
-
 			createSingleImage(json);
 		});
 }
 
+//this function will create a single image to show on the page(same as render image)
 function createSingleImage(image) {
 	let mainCard = document.getElementById('main-card-group');
 	const card = document.createElement('div');
@@ -541,20 +544,18 @@ function createSingleImage(image) {
 }
 
 //ATTENDING BUTTON AND FUNCTION
-
+//adds an see whos attending button
 let attending = document.getElementById('attending');
-console.log('attending made', attending);
+//upon click it will hide the main images page and show whos coming to the event
 attending.addEventListener('click', () => {
-	console.log('atttending clikced');
 	hideElements('main-card-group');
 	showAttendents(DATAS);
 });
 
+//this will create each user image in the whos coming page
 function showAttendents(DATAS) {
-	console.log('were in showAttending');
 	hideButton('imageB');
 	hideButton('attending');
-	console.log('we hid buttons');
 	let mainBody = document.body;
 	let mainFaceDiv = document.createElement('div');
 	mainFaceDiv.id = 'main-face-div';
@@ -566,9 +567,9 @@ function showAttendents(DATAS) {
 	mainFaceDiv.appendChild(faceBackButton);
 	faceBackButton.addEventListener('click', () => {
 		goBackUsers();
-		console.log('in the back button');
 	});
 	fetchingData();
+	//looping through the 'data' or users
 	for (let data of DATAS) {
 		console.log('where in the show attending data loop');
 		let faceDiv = document.createElement('div');
@@ -584,9 +585,8 @@ function showAttendents(DATAS) {
 		faceDiv.appendChild(faceImg);
 	}
 }
-
+//a go back button that will hide the whos coming page and show the main images page
 function goBackUsers() {
-	console.log('in the back users');
 	$('#main-face-div').remove();
 	$('#show-row-id').remove();
 	hideElements('main-face-div');
@@ -595,7 +595,7 @@ function goBackUsers() {
 	showElements('attending');
 }
 
-//CLOCK JS WE FOUND FROM THE INTERNET
+//---CLOCK JS WE FOUND FROM FLIPCLOCK.JS---
 function getTimeRemaining(endtime) {
 	var t = Date.parse(endtime) - Date.parse(new Date());
 	var seconds = Math.floor((t / 1000) % 60);
@@ -634,6 +634,5 @@ function initializeClock(id, endtime) {
 	updateClock();
 	var timeinterval = setInterval(updateClock, 1000);
 }
-
 var deadline = new Date(Date.parse(new Date()) + 90 * 24 * 60 * 60 * 1000);
 initializeClock('clockdiv', deadline);
